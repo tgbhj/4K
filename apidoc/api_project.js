@@ -1,0 +1,16 @@
+define({
+  "title": "4K API",
+  "url": "https://seei.tv",
+  "name": "4K",
+  "version": "0.1.0",
+  "description": "4K",
+  "sampleUrl": false,
+  "defaultVersion": "0.0.0",
+  "apidoc": "0.3.0",
+  "generator": {
+    "name": "apidoc",
+    "time": "2018-03-30T03:10:12.976Z",
+    "url": "http://apidocjs.com",
+    "version": "0.17.6"
+  }
+});

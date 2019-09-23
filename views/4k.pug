@@ -1,0 +1,449 @@
+doctype html
+html
+    head
+        title SEEi.TV-4K专用页面
+        meta(charset="utf-8" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+        link(href='/element-ui/lib/theme-chalk/index.css' rel="stylesheet")
+        script(src='/vue/dist/vue.js')
+        script(src='/vue-resource/dist/vue-resource.js')
+        script(src='/element-ui/lib/index.js')
+        //script.
+        //    var url = window.location.href;
+        //    if (url.indexOf("https") < 0) {
+        //        url = url.replace("http:", "https:");
+        //        window.location.replace(url);
+        //    }
+    body(style='margin:0;padding:0;')
+        div#app
+            el-menu(mode='horizontal' background-color="#545c64" text-color="#fff" active-text-color="#ffd04b")
+                el-menu-item(index='1' style='font-size:20px')
+                    a(href='/4k/4k' style='text-decoration:none') SEEi.TV-4K专用页面
+            el-tabs
+                el-tab-pane(label='4K视频上传')
+                    el-row
+                        el-col(:xs='{span:22,offset:1}', :sm='{span:8,offset:8}', :md='{span:8,offset:8}', :lg='{span:8,offset:8}', :xl='{span:8,offset:8}')
+                            el-form(:model='ruleForm2', :rules="rules" ref="ruleForm2")
+                                el-form-item
+                                    center
+                                        b(style='font-size:20px;padding-top:10px') 4K视频上传
+                                el-form-item(label='视频标题' prop='title')
+                                    el-input(v-model='ruleForm2.title' placeholder='title' clearable)
+                                el-form-item(label='视频标题-EN' prop='title')
+                                    el-input(v-model='ruleForm2.title_en' placeholder='title_en' clearable)
+                                el-form-item(label='详细信息' prop='detail')
+                                    el-input(type='textarea' v-model='ruleForm2.detail' placeholder='detail' clearable)
+                                el-form-item(label='详细信息-EN' prop='detail')
+                                    el-input(type='textarea' v-model='ruleForm2.detail_en' placeholder='detail_en' clearable)
+                                el-form-item(label='导演' prop='director')
+                                    el-input(v-model='ruleForm2.director' placeholder='director' clearable)
+                                el-form-item(label='导演-EN' prop='director')
+                                    el-input(v-model='ruleForm2.director_en' placeholder='director_en' clearable)
+                                el-form-item(label='演员' prop='actors')
+                                    el-input(v-model='ruleForm2.actors' placeholder='actors' clearable)
+                                el-form-item(label='演员-EN' prop='actors')
+                                    el-input(v-model='ruleForm2.actors_en' placeholder='actors_en' clearable)
+                                el-form-item(label='时长' prop='runtime')
+                                    el-input(type='number' v-model='ruleForm2.runtime' placeholder='runtime')
+                                el-form-item(label='地区' prop='region')
+                                    el-select(v-model='ruleForm2.region' placeholder='region')
+                                        el-option(v-for='region in options2', :key="region.value", :label='region.label', :value='region.value')
+                                el-form-item(label='地区-EN' prop='region')
+                                    el-select(v-model='ruleForm2.region_en' placeholder='region_en')
+                                        el-option(v-for='region_en in options6', :key="region_en.value", :label='region_en.label', :value='region_en.value')
+                                el-form-item(label='类型' prop='type')
+                                    el-select(v-model='ruleForm2.type' placeholder='type')
+                                        el-option(v-for='type in options1', :key="type.value", :label='type.label', :value='type.value')
+                                el-form-item(label='编码' prop='codec')
+                                    el-select(v-model='ruleForm2.codec' placeholder='codec')
+                                        el-option(v-for='codec in options5', :key="codec.value", :label='codec.label', :value='codec.value')
+                                el-form-item(label='登录需求' prop='sign')
+                                    el-select(v-model='ruleForm2.sign' placeholder='sign')
+                                        el-option(v-for='sign in options3', :key="sign.value", :label='sign.label', :value='sign.value')
+                                el-form-item(label='免费/收费' prop='charge')
+                                    el-select(v-model='ruleForm2.charge' placeholder='charge')
+                                        el-option(v-for='charge in options4', :key="charge.value", :label='charge.label', :value='charge.value')
+                                div(v-if='ruleForm2.charge == "收费"')
+                                    el-form-item(label='价格' prop='money')
+                                        el-input(type='number' v-model='ruleForm2.money' placeholder='money')
+                                el-form-item(label='上传封面')
+                                    el-upload(action='/4k/image' name='image' accept='image/*', :on-success='handleSuccess', :on-error='handleError', :on-exceed='handleExceed')
+                                        el-button(type='primary' icon='upload') 上传封面
+                                        .el-upload__tip(slot='tip') 封面尺寸300x444
+                                el-form-item(label='上传视频')
+                                    el-upload(action='/4k/upload' name='video' accept='video/mp4', :on-success='handleSuccess', :on-error='handleError', :on-exceed='handleExceed')
+                                        el-button(type='primary' icon='upload') 上传视频
+                                        .el-upload__tip(slot='tip') 只能上传mp4文件
+                                el-form-item
+                                    el-button(@click='upload' type='primary' style='width:100%') 保 存
+                el-tab-pane(label='4K预览')
+                    el-row
+                        el-col(:span='22', :offset='1')
+                            el-row(:gutter='10')
+                                el-col(:xs='12', :sm='4', :md='4', :lg='4', :xl='4' v-for='video in videos', :key='video._id' style='position:relative')
+                                    el-button(type='danger' style="position:absolute;top:5px", @click="remove(video._id)")
+                                        i.el-icon-delete
+                                    el-card(:body-style="{padding:'0'}")
+                                        img(:src='video.poster' style='width:100%;height:100%')
+                                        div(style='padding:10px 7px;')
+                                            span {{video.title}}
+                                    p
+                    center(style='padding-top:10px;padding-bottom:10px')
+                        el-pagination(:current-page='1', :page-size='30' layout='total, prev, pager, next', :total='videos.length')
+                el-tab-pane(label='推荐设置')
+                    el-table(:data='videos' style='width:100%' stripe border @selection-change="handleSelectionChange")
+                        el-table-column(type="selection")
+                        el-table-column(prop='title' label='视频标题')
+                        el-table-column(prop='type' label='类型(0(电影),1(纪录片),2(旅游风光),3(综艺))')
+                        el-table-column(prop='createTime' label='上传时间')
+                        el-table-column(prop='recommend' label='推荐(0(不推荐),1(推荐))')
+                    div(style='text-align: center;margin: 10px auto;')
+                        el-button(type="primary", @click='recommend') 提交推荐
+                        el-button(type='danger', @click='commend') 取消推荐
+                    div(style='padding-bottom:10px;text-align: center;margin: 10px auto;')
+                        el-pagination(:current-page='1', :page-size='30' layout='total, prev, pager, next', :total='videos.length')
+                el-tab-pane(label='APK上传')
+                    el-col(:xs='{span:22,offset:1}', :sm='{span:8,offset:8}', :md='{span:8,offset:8}', :lg='{span:8,offset:8}', :xl='{span:8,offset:8}')
+                        el-form(:model='ruleForm1', :rules="rules" ref="ruleForm1")
+                            el-form-item
+                                center
+                                    b(style='font-size:20px;padding-top:10px') APK上传
+                            el-form-item(label='apkName' prop='apkName')
+                                el-input(v-model='ruleForm1.apkName' placeholder='apkName' clearable)
+                            el-form-item(label='versionCode' prop='versionCode')
+                                el-input(type='number' v-model='ruleForm1.versionCode' placeholder='versionCode')
+                            el-form-item(label='detail' prop='detail')
+                                el-input(type='textarea' v-model='ruleForm1.detail' placeholder='detail' clearable)
+                            el-form-item
+                                el-upload(action='/4k/apk' name='apk' accept='.apk', :on-success='handleSuccess', :on-error='handleError', :on-exceed='handleExceed')
+                                    el-button(type='primary' icon='upload') 选择apk并上传
+                                    .el-upload__tip(slot='tip') 选择后自动上传，只能上传apk文件
+                            el-form-item
+                                el-button(type='primary' style='width:100%', @click='save') 保 存
+        script.
+            new Vue({
+                el: '#app',
+                data() {
+                    return {
+                        videos: [],
+                        options1: [{
+                            value: '电影',
+                            label: '电影'
+                        }, {
+                            value: '纪录片',
+                            label: '纪录片'
+                        }, {
+                            value: '旅游风光',
+                            label: '旅游风光'
+                        }, {
+                            value: '综艺',
+                            label: '综艺'
+                        }],
+                        options2: [{
+                            value: '中国',
+                            label: '中国'
+                        }, {
+                            value: '美国',
+                            label: '美国'
+                        }],
+                        options6: [{
+                            value: 'China',
+                            label: 'China'
+                        }, {
+                            value: 'U.S.A',
+                            label: 'U.S.A'
+                        }],
+                        options3: [{
+                            value: '不需要登陆',
+                            label: '不需要登陆'
+                        }, {
+                            value: '需要登陆',
+                            label: '需要登陆'
+                        }],
+                        options4: [{
+                            value: '免费',
+                            label: '免费'
+                        }, {
+                            value: '收费',
+                            label: '收费'
+                        }],
+                        options5: [{
+                            value: 'h.264',
+                            label: 'h.264'
+                        }, {
+                            value: 'h.265',
+                            label: 'h.265'
+                        }],
+                        dialogSignVisible: false,
+                        ruleForm1: {
+                            apkName: '',
+                            versionCode: '',
+                            detail: ''
+                        },
+                        ruleForm2: {
+                            title: '',
+                            title_en: '',
+                            detail: '',
+                            detail_en: '',
+                            type: '',
+                            codec: '',
+                            sign: '',
+                            charge: '',
+                            money: 0,
+                            runtime: 0,
+                            director: '',
+                            director_en: '',
+                            actors: '',
+                            actors_en: '',
+                            region: '',
+                            region_en: ''
+                        },
+                        multipleSelection: [],
+                        rules: {
+                            title: [
+                                {required: true, message: '请输入视频标题', trigger: 'blur'},
+                                {min: 1, max: 30, message: '长度在1到30个字符', trigger: 'blur, change'}
+                            ],
+                            detail: [
+                                {required: true, message: '请输入详细信息', trigger: 'blur'}
+                            ],
+                            type: [
+                                {required: true, message: '请选择视频类型', trigger: 'blur'}
+                            ],
+                            codec: [
+                                {required: true, message: '请选择视频编码', trigger: 'blur'}
+                            ],
+                            sign: [
+                                {required: true, message: '请选择登录需求', trigger: 'blur'}
+                            ],
+                            charge: [
+                                {required: true, message: '请选择免费或收费', trigger: 'blur'}
+                            ],
+                            money: [
+                                {required: true, message: '请输入价格', trigger: 'blur'}
+                            ],
+                            runtime: [
+                                {required: true, message: '请输入时长', trigger: 'blur'}
+                            ],
+                            director: [
+                                {required: true, message: '请输入导演', trigger: 'blur'}
+                            ],
+                            actors: [
+                                {required: true, message: '请输入演员', trigger: 'blur'}
+                            ],
+                            region: [
+                                {required: true, message: '请选择地区', trigger: 'blur'}
+                            ],
+                            apkName: [
+                                {required: true, message: '请输入apkName', trigger: 'blur'},
+                                {min: 1, max: 18, message: '长度在1到18个字符', trigger: 'blur, change'}
+                            ],
+                            versionCode: [
+                                {required: true, message: '请输入versionCode', trigger: 'blur'},
+                                {min: 1, max: 8, message: '长度在1到8个字符', trigger: 'blur, change'}
+                            ]
+                        }
+                    }
+                },
+                created() {
+                    this.$http.get('/4k/4kVideos').then(function (res) {
+                        this.videos = res.body.data
+                    })
+                },
+                methods: {
+                    save() {
+                        this.$refs.ruleForm1.validate(function (valid) {
+                            if (valid) {
+                                this.$http.post('/4k/apksave', this.ruleForm1).then(function (res) {
+                                    if (res.body) {
+                                        this.$notify({
+                                            title: '成功',
+                                            message: '保存成功',
+                                            type: 'success',
+                                            offset: 100
+                                        })
+                                        setTimeout(function () {
+                                            window.location.reload()
+                                        }, 1000)
+                                    } else {
+                                        this.$notify({
+                                            title: '错误',
+                                            message: '保存失败',
+                                            type: 'error',
+                                            offset: 100
+                                        })
+                                    }
+                                })
+                            } else {
+                                this.$notify({
+                                    title: '错误',
+                                    message: '表单不能为空',
+                                    type: 'error',
+                                    offset: 100
+                                })
+                            }
+                        }.bind(this))
+                    },
+                    remove(_id) {
+                        this.$http.delete('/4k/4kdelete/' + _id, {headers: {'_id': _id}}).then(function (res) {
+                            if (res.body) {
+                                this.$notify({
+                                    title: '成功',
+                                    message: '删除成功',
+                                    type: 'success',
+                                    offset: 100
+                                })
+                                setTimeout(function () {
+                                    window.location.reload()
+                                }, 2000)
+                            } else {
+                                this.$notify({
+                                    title: '错误',
+                                    message: '删除失败',
+                                    type: 'error',
+                                    offset: 100
+                                })
+                            }
+                        })
+                    },
+                    handleSelectionChange(val) {
+                        this.multipleSelection = val;
+                    },
+                    recommend() {
+                        this.$http.post('/4k/recommend', this.multipleSelection).then(function (res) {
+                            if (res.body) {
+                                this.$notify({
+                                    title: '成功',
+                                    message: '提交成功',
+                                    type: 'success',
+                                    offset: 100
+                                })
+                                setTimeout(function () {
+                                    window.location.reload()
+                                }, 1000)
+                            } else {
+                                this.$notify({
+                                    title: '错误',
+                                    message: '提交失败',
+                                    type: 'error',
+                                    offset: 100
+                                })
+                            }
+                        })
+                    },
+                    commend() {
+                        this.$http.post('/4k/commend', this.multipleSelection).then(function (res) {
+                            if (res.body) {
+                                this.$notify({
+                                    title: '成功',
+                                    message: '提交成功',
+                                    type: 'success',
+                                    offset: 100
+                                })
+                                setTimeout(function () {
+                                    window.location.reload()
+                                }, 1000)
+                            } else {
+                                this.$notify({
+                                    title: '错误',
+                                    message: '提交失败',
+                                    type: 'error',
+                                    offset: 100
+                                })
+                            }
+                        })
+                    },
+                    upload() {
+                        this.$refs.ruleForm2.validate(function (valid) {
+                            if (valid) {
+                                if (this.ruleForm2.type == '电影') {
+                                    this.ruleForm2.type = 0
+                                } else if (this.ruleForm2.type == '纪录片') {
+                                    this.ruleForm2.type = 1
+                                } else if (this.ruleForm2.type == '旅游风光') {
+                                    this.ruleForm2.type = 2
+                                } else {
+                                    this.ruleForm2.type = 3
+                                }
+                                if (this.ruleForm2.sign == '不需要登陆') {
+                                    this.ruleForm2.sign = 0
+                                } else {
+                                    this.ruleForm2.sign = 1
+                                }
+                                if (this.ruleForm2.charge == '免费') {
+                                    this.ruleForm2.charge = 0
+                                } else {
+                                    this.ruleForm2.charge = 1
+                                }
+                                this.$http.post('/4k/savevideo', {
+                                    title: this.ruleForm2.title,
+                                    detail: this.ruleForm2.detail,
+                                    type: this.ruleForm2.type,
+                                    codec: this.ruleForm2.codec,
+                                    sign: this.ruleForm2.sign,
+                                    charge: this.ruleForm2.charge,
+                                    money: this.ruleForm2.money,
+                                    title_en: this.ruleForm2.title_en,
+                                    detail_en: this.ruleForm2.detail_en,
+                                    runtime: this.ruleForm2.runtime,
+                                    region: this.ruleForm2.region,
+                                    region_en: this.ruleForm2.region_en,
+                                    director: this.ruleForm2.director,
+                                    actors: this.ruleForm2.actors,
+                                    director_en: this.ruleForm2.director_en,
+                                    actors_en: this.ruleForm2.actors_en
+                                }).then(function (res) {
+                                    if (res.body.code == 200) {
+                                        this.$notify({
+                                            title: '成功',
+                                            message: '视频保存成功',
+                                            type: 'success',
+                                            offset: 100
+                                        })
+                                        setTimeout(function () {
+                                            window.location.reload()
+                                        }, 1000)
+                                    } else {
+                                        this.$notify({
+                                            title: '失败',
+                                            message: '视频保存失败',
+                                            type: 'error',
+                                            offset: 100
+                                        })
+                                    }
+                                })
+                            } else {
+                                this.$notify({
+                                    title: '错误',
+                                    message: '表单不能为空',
+                                    type: 'error',
+                                    offset: 100
+                                })
+                            }
+                        }.bind(this))
+                    },
+                    handleSuccess(response, file, fileList) {
+                        this.$notify({
+                            title: '成功',
+                            message: '上传成功',
+                            type: 'success',
+                            offset: 100
+                        })
+                    },
+                    handleError(err, file, fileList) {
+                        this.$notify({
+                            title: '失败',
+                            message: '上传失败',
+                            type: 'error',
+                            offset: 100
+                        })
+                    },
+                    handleExceed(files, fileList) {
+                        this.$notify({
+                            title: '失败',
+                            message: '上传数量为1',
+                            type: 'error',
+                            offset: 100
+                        })
+                    }
+                }
+            })
